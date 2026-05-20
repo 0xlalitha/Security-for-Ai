@@ -1,0 +1,256 @@
+
+<style>
+  :root { --pad: 1rem 1.25rem; }
+  .roadmap-wrap { padding: 1rem 0; font-family: var(--font-sans); }
+  .phase-header { display: flex; align-items: center; gap: 10px; margin: 2rem 0 1rem; padding: 0.75rem 1rem; border-radius: var(--border-radius-lg); }
+  .phase-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .phase-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+  .phase-sub { font-size: 13px; color: var(--color-text-secondary); margin-left: auto; }
+  .week-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 0.5rem; }
+  .day-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 12px; cursor: pointer; transition: border-color 0.15s; }
+  .day-card:hover { border-color: var(--color-border-primary); }
+  .day-card.active { border-width: 1.5px; }
+  .day-num { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 4px; }
+  .day-topic { font-size: 13px; font-weight: 500; color: var(--color-text-primary); line-height: 1.4; }
+  .day-tag { display: inline-block; font-size: 11px; margin-top: 6px; padding: 2px 8px; border-radius: 20px; }
+  .detail-panel { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+  .detail-panel h3 { font-size: 16px; font-weight: 500; margin: 0 0 0.5rem; color: var(--color-text-primary); }
+  .detail-panel .meta { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 1rem; }
+  .detail-items { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .detail-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+  .detail-item i { margin-top: 2px; flex-shrink: 0; }
+  .ask-btn { margin-top: 1rem; }
+  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .filter-btn { font-size: 12px; padding: 4px 12px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); cursor: pointer; }
+  .filter-btn.on { border-width: 1.5px; }
+  .week-label { font-size: 12px; color: var(--color-text-tertiary); margin: 1rem 0 0.5rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .progress-bar { height: 4px; border-radius: 2px; background: var(--color-border-tertiary); margin-bottom: 1.5rem; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 2px; }
+</style>
+
+<div class="roadmap-wrap">
+  <h2 class="sr-only">60-day Security for AI learning roadmap with daily topics</h2>
+
+  <div class="filter-row" id="filterRow"></div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+  <div id="detailPanel" style="display:none;"></div>
+  <div id="roadmapBody"></div>
+</div>
+
+<script>
+const phases = [
+  {
+    id: "foundations",
+    label: "Phase 1 — Foundations",
+    days: "Days 1–15",
+    color: "#534AB7",
+    bg: "#EEEDFE",
+    tagBg: "#EEEDFE",
+    tagColor: "#3C3489",
+    weeks: [
+      { label: "Week 1 — AI & Security basics", days: [
+        { d:1, topic:"AI/ML crash course", tag:"concept", items:["Supervised vs unsupervised learning","Neural network basics","Model training lifecycle","Key ML terminology"] },
+        { d:2, topic:"Security fundamentals", tag:"concept", items:["CIA triad (Confidentiality, Integrity, Availability)","Threat modeling basics","Attack surface overview","Defense-in-depth principle"] },
+        { d:3, topic:"Threat actors & motives", tag:"concept", items:["Nation-state vs criminal actors","Insider threats","Motivations: espionage, sabotage, profit","AI-specific attacker profiles"] },
+        { d:4, topic:"AI attack taxonomy", tag:"concept", items:["MITRE ATLAS framework","Taxonomy of ML attacks","Attack phases: pre/post-deployment","AI threat landscape map"] },
+        { d:5, topic:"Python & ML tooling setup", tag:"hands-on", items:["Set up Python + virtualenv","Install scikit-learn, PyTorch","Jupyter Notebook basics","Version control for ML projects"] },
+        { d:6, topic:"Data pipelines & risks", tag:"concept", items:["ETL pipeline stages","Data collection risks","Label integrity issues","Supply chain for training data"] },
+        { d:7, topic:"Review + quiz day", tag:"review", items:["Revisit days 1–6 notes","Self-quiz key definitions","Map terms to real incidents","Identify knowledge gaps"] }
+      ]},
+      { label: "Week 2 — Core attack types", days: [
+        { d:8, topic:"Adversarial examples", tag:"attack", items:["FGSM & PGD attacks","L∞ vs L2 perturbations","White-box vs black-box","Fooling image classifiers demo"] },
+        { d:9, topic:"Adversarial attacks lab", tag:"hands-on", items:["Implement FGSM in PyTorch","Craft examples on MNIST","Visualize perturbations","Measure accuracy drop"] },
+        { d:10, topic:"Data poisoning", tag:"attack", items:["Clean-label poisoning","Backdoor injection via data","Poisoning in federated ML","Real-world poisoning incidents"] },
+        { d:11, topic:"Model inversion attacks", tag:"attack", items:["Recovering training data","Gradient inversion","Membership inference","Privacy implications"] },
+        { d:12, topic:"Model stealing", tag:"attack", items:["Query-based extraction","Knockoff nets technique","Defending model APIs","IP theft implications"] },
+        { d:13, topic:"Evasion attacks deep dive", tag:"attack", items:["Transferability property","Physical adversarial patches","Audio/NLP evasion","Robustness benchmarks"] },
+        { d:14, topic:"Week 2 review & CTF", tag:"review", items:["Capture the Flag practice","Reproduce one lab attack","Write a short attack report","Map to MITRE ATLAS"] }
+      ]},
+      { label: "Week 3 — LLM & Generative AI risks", days: [
+        { d:15, topic:"LLM threat overview", tag:"concept", items:["How LLMs are different","OWASP Top 10 for LLMs","Threat surface: input/output","Prompt vs fine-tune attacks"] }
+      ]}
+    ]
+  },
+  {
+    id: "llm",
+    label: "Phase 2 — LLM & GenAI Security",
+    days: "Days 15–30",
+    color: "#0F6E56",
+    bg: "#E1F5EE",
+    tagBg: "#E1F5EE",
+    tagColor: "#085041",
+    weeks: [
+      { label: "Week 3 cont'd — Prompt attacks", days: [
+        { d:16, topic:"Prompt injection basics", tag:"attack", items:["Direct prompt injection","Indirect injection via retrieval","Goal hijacking patterns","Live demo: ChatGPT/Gemini probes"] },
+        { d:17, topic:"Prompt injection lab", tag:"hands-on", items:["Build a vulnerable chatbot","Craft 5 injection payloads","Document bypass techniques","Compare mitigation outputs"] },
+        { d:18, topic:"Jailbreaking techniques", tag:"attack", items:["Role-play & persona jailbreaks","Many-shot jailbreaking","Token smuggling","Automated red-teaming tools"] },
+        { d:19, topic:"Data extraction from LLMs", tag:"attack", items:["System prompt leakage","Training data extraction","PII leakage via inference","Bing Chat real incident case"] },
+        { d:20, topic:"RAG & retrieval attacks", tag:"attack", items:["Poisoned document injection","Context window manipulation","Vector store poisoning","Defense: input/output filters"] },
+        { d:21, topic:"Agentic AI risks", tag:"concept", items:["Tool-use & code execution risks","RLHF & reward hacking","Agent orchestration attacks","AutoGPT-class threat models"] }
+      ]},
+      { label: "Week 4 — GenAI & model supply chain", days: [
+        { d:22, topic:"Model supply chain security", tag:"concept", items:["Hugging Face repo risks","Malicious model weights","Pickle exploit (torch.load)","Safe serialization practices"] },
+        { d:23, topic:"Deepfake & synthetic media", tag:"concept", items:["Deepfake detection landscape","Voice cloning attacks","NSFW/disinformation risks","Watermarking countermeasures"] },
+        { d:24, topic:"AI-generated malware", tag:"attack", items:["LLM-assisted code attack tools","Polymorphic malware via LLMs","Social engineering automation","Detection approaches"] },
+        { d:25, topic:"LLM red-teaming methods", tag:"hands-on", items:["Manual red-team checklist","PyRIT tool walkthrough","Garak LLM scanner","Building evaluation harness"] },
+        { d:26, topic:"Output validation & guardrails", tag:"defense", items:["Input sanitization patterns","Output classifiers","Constitutional AI approach","Llama Guard / NeMo Guardrails"] },
+        { d:27, topic:"Phase 2 review & lab", tag:"review", items:["Run full red-team on test LLM","Document 3 critical findings","Map findings to OWASP LLM10","Draft mitigation plan"] },
+        { d:28, topic:"AI governance basics", tag:"concept", items:["NIST AI RMF overview","EU AI Act highlights","Responsible AI principles","Risk classification tiers"] }
+      ]},
+      { label: "Week 5 — Defenses begin", days: [
+        { d:29, topic:"Adversarial training intro", tag:"defense", items:["Augmenting training with attacks","PGD-AT method","Trade-off: robustness vs accuracy","When to use adversarial training"] },
+        { d:30, topic:"Certified robustness", tag:"defense", items:["Randomized smoothing theory","Lipschitz-bounded networks","IBP (interval bound propagation)","Practical robustness benchmarks"] }
+      ]}
+    ]
+  },
+  {
+    id: "defenses",
+    label: "Phase 3 — Defenses & Privacy",
+    days: "Days 30–45",
+    color: "#185FA5",
+    bg: "#E6F1FB",
+    tagBg: "#E6F1FB",
+    tagColor: "#0C447C",
+    weeks: [
+      { label: "Week 5 cont'd — Defense toolkit", days: [
+        { d:31, topic:"Differential privacy", tag:"defense", items:["DP-SGD algorithm","Privacy budget (ε, δ)","Trade-off with model utility","TensorFlow Privacy hands-on"] },
+        { d:32, topic:"Federated learning security", tag:"defense", items:["Federated averaging risks","Byzantine-resilient aggregation","Secure aggregation protocols","Gradient clipping & noise"] },
+        { d:33, topic:"Input preprocessing defenses", tag:"defense", items:["Feature squeezing","JPEG compression defense","Input transformation pipelines","Denoising autoencoders"] },
+        { d:34, topic:"Detection & monitoring", tag:"defense", items:["Anomaly detection on model inputs","OOD detection methods","Runtime monitoring systems","Model behavior dashboards"] },
+        { d:35, topic:"Secure ML deployment", tag:"defense", items:["Model serving hardening","API rate limiting & auth","Container/K8s security for ML","Zero-trust ML inference"] }
+      ]},
+      { label: "Week 6 — Privacy & interpretability", days: [
+        { d:36, topic:"ML privacy deep dive", tag:"concept", items:["Membership inference attacks","Attribute inference","Reconstruction attacks","Privacy metrics & audits"] },
+        { d:37, topic:"Privacy lab (DP-SGD)", tag:"hands-on", items:["Implement DP-SGD from scratch","Measure accuracy vs ε curve","Compare with baseline","Report privacy guarantees"] },
+        { d:38, topic:"Explainability & security", tag:"concept", items:["SHAP & LIME overview","Adversarial interpretability","When XAI aids attackers","Explanation faithfulness"] },
+        { d:39, topic:"Model watermarking", tag:"defense", items:["Backdoor-based watermarking","Radioactive data approach","IP protection strategies","Watermark robustness tests"] },
+        { d:40, topic:"Secure multi-party computation", tag:"concept", items:["Secret sharing basics","SMPC for ML inference","Homomorphic encryption intro","When to use each primitive"] },
+        { d:41, topic:"Trusted execution environments", tag:"concept", items:["Intel SGX & AMD SEV","TEE-based ML inference","Confidential computing for AI","Use cases & limitations"] },
+        { d:42, topic:"Phase 3 review & project", tag:"review", items:["Build mini-defense pipeline","Test adversarial inputs against it","Benchmark robustness score","Present findings in notebook"] }
+      ]},
+      { label: "Week 7 — Real systems", days: [
+        { d:43, topic:"AI in cloud security", tag:"concept", items:["AWS/GCP/Azure AI services","Shared responsibility for AI","IAM for ML workloads","Cloud-native AI threats"] },
+        { d:44, topic:"MLOps security", tag:"concept", items:["CI/CD pipeline hardening","Artifact integrity (hashes, signing)","Secrets in ML configs","Automated security scanning"] },
+        { d:45, topic:"Incident response for AI", tag:"concept", items:["Detecting model compromise","Forensics on model artifacts","Rollback & re-training strategies","Tabletop: AI breach scenario"] }
+      ]}
+    ]
+  },
+  {
+    id: "advanced",
+    label: "Phase 4 — Advanced & Applied",
+    days: "Days 45–60",
+    color: "#993C1D",
+    bg: "#FAECE7",
+    tagBg: "#FAECE7",
+    tagColor: "#712B13",
+    weeks: [
+      { label: "Week 7 cont'd — Domain applications", days: [
+        { d:46, topic:"AI security in healthcare", tag:"applied", items:["Medical imaging adversarial risks","EHR model poisoning","HIPAA + AI compliance","FDA AI/ML guidance overview"] },
+        { d:47, topic:"AI security in finance", tag:"applied", items:["Fraud detection model attacks","Algorithmic trading manipulation","Model risk management (SR 11-7)","Adversarial examples in credit"] },
+        { d:48, topic:"Autonomous systems security", tag:"applied", items:["Adversarial attacks on AV perception","LIDAR & camera spoofing","Safety vs security trade-offs","ISO 21434 automotive security"] },
+        { d:49, topic:"AI in cybersecurity tools", tag:"applied", items:["AI-powered SIEM & SOAR","Adversarial ML vs IDS/IPS","Evading ML-based malware detectors","AI-assisted vulnerability scanning"] }
+      ]},
+      { label: "Week 8 — Cutting edge", days: [
+        { d:50, topic:"Foundation model security", tag:"concept", items:["RLHF attack surface","Fine-tuning security risks","Model merging & Frankenstein models","Safety alignment vs jailbreak"] },
+        { d:51, topic:"AI safety vs AI security", tag:"concept", items:["Misalignment vs adversarial threat","Mesa-optimization risks","Treacherous turn scenarios","Overlap with ML robustness"] },
+        { d:52, topic:"Multimodal attack surfaces", tag:"attack", items:["Vision-language model attacks","Audio injection in voice AI","Cross-modal adversarial examples","CLIP & DALL-E probing"] },
+        { d:53, topic:"Red team methodology", tag:"hands-on", items:["Full AI red team playbook","Threat model an ML system","Automated + manual techniques","Deliverables: findings report"] },
+        { d:54, topic:"AI security standards & certs", tag:"concept", items:["ISO/IEC 42001 AI management","NIST CSF + AI profile","SOC 2 for AI companies","ML-specific pen test frameworks"] },
+        { d:55, topic:"Regulatory deep dive", tag:"concept", items:["EU AI Act compliance checklist","US Executive Order on AI","GDPR & AI interactions","Global regulatory landscape"] },
+        { d:56, topic:"Building secure AI systems", tag:"applied", items:["Secure by design principles","MLSecOps integration","AI bill of materials (AI-BOM)","Shift-left security for AI"] }
+      ]},
+      { label: "Week 9 — Capstone", days: [
+        { d:57, topic:"Capstone project day 1", tag:"project", items:["Pick a target AI system","Define threat model","Plan attacks & defenses","Set up environment"] },
+        { d:58, topic:"Capstone project day 2", tag:"project", items:["Execute planned attacks","Document all findings","Implement mitigations","Measure effectiveness"] },
+        { d:59, topic:"Capstone project day 3", tag:"project", items:["Write full security report","Map to MITRE ATLAS/OWASP","Prepare 5-min presentation","Peer review if available"] },
+        { d:60, topic:"Review & next steps", tag:"review", items:["Revisit all 4 phases","Build personal study notes","Identify advanced topics","Certifications roadmap ahead"] }
+      ]}
+    ]
+  }
+];
+
+const tagColors = {
+  concept: { bg:"#E6F1FB", color:"#0C447C" },
+  "hands-on": { bg:"#EAF3DE", color:"#27500A" },
+  attack: { bg:"#FCEBEB", color:"#791F1F" },
+  defense: { bg:"#E1F5EE", color:"#085041" },
+  review: { bg:"#F1EFE8", color:"#444441" },
+  applied: { bg:"#FAEEDA", color:"#633806" },
+  project: { bg:"#EEEDFE", color:"#3C3489" }
+};
+
+let activeDay = null;
+let activeFilter = "all";
+
+function renderAll() {
+  const body = document.getElementById("roadmapBody");
+  body.innerHTML = "";
+  phases.forEach(phase => {
+    const phaseEl = document.createElement("div");
+    const phaseHeader = document.createElement("div");
+    phaseHeader.className = "phase-header";
+    phaseHeader.style.background = phase.bg;
+    phaseHeader.innerHTML = `<div class="phase-dot" style="background:${phase.color}"></div><span class="phase-title">${phase.label}</span><span class="phase-sub">${phase.days}</span>`;
+    phaseEl.appendChild(phaseHeader);
+
+    phase.weeks.forEach(week => {
+      const filteredDays = week.days.filter(d => activeFilter === "all" || d.tag === activeFilter);
+      if (!filteredDays.length) return;
+      const wl = document.createElement("div");
+      wl.className = "week-label";
+      wl.textContent = week.label;
+      phaseEl.appendChild(wl);
+      const grid = document.createElement("div");
+      grid.className = "week-grid";
+      filteredDays.forEach(day => {
+        const card = document.createElement("div");
+        card.className = "day-card" + (activeDay === day.d ? " active" : "");
+        if (activeDay === day.d) card.style.borderColor = phase.color;
+        const tc = tagColors[day.tag] || tagColors.concept;
+        card.innerHTML = `<div class="day-num">Day ${day.d}</div><div class="day-topic">${day.topic}</div><span class="day-tag" style="background:${tc.bg};color:${tc.color}">${day.tag}</span>`;
+        card.onclick = () => selectDay(day, phase.color, phase.label);
+        grid.appendChild(card);
+      });
+      phaseEl.appendChild(grid);
+    });
+    body.appendChild(phaseEl);
+  });
+}
+
+function selectDay(day, color, phaseLabel) {
+  activeDay = day.d;
+  renderAll();
+  const panel = document.getElementById("detailPanel");
+  panel.style.display = "block";
+  const tc = tagColors[day.tag] || tagColors.concept;
+  panel.innerHTML = `
+    <h3 style="color:var(--color-text-primary)">Day ${day.d} — ${day.topic}</h3>
+    <div class="meta">${phaseLabel} &nbsp;·&nbsp; <span style="background:${tc.bg};color:${tc.color};padding:2px 8px;border-radius:20px;font-size:12px">${day.tag}</span></div>
+    <div class="detail-items">${day.items.map(it => `<div class="detail-item"><i class="ti ti-circle-check" aria-hidden="true" style="color:${color};font-size:16px;margin-top:1px"></i><span>${it}</span></div>`).join("")}</div>
+    <button class="ask-btn" onclick="sendPrompt('Tell me how to study Day ${day.d}: ${day.topic} in detail with resources and exercises')">Ask Claude to elaborate on this day ↗</button>
+  `;
+  panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  const total = 60;
+  document.getElementById("progressFill").style.background = color;
+  document.getElementById("progressFill").style.width = (day.d / total * 100) + "%";
+}
+
+function renderFilters() {
+  const row = document.getElementById("filterRow");
+  const tags = ["all", "concept", "attack", "defense", "hands-on", "applied", "review", "project"];
+  const labels = { all:"All days", concept:"Concepts", attack:"Attacks", defense:"Defenses", "hands-on":"Labs", applied:"Applied", review:"Reviews", project:"Capstone" };
+  tags.forEach(t => {
+    const btn = document.createElement("button");
+    btn.className = "filter-btn" + (t === activeFilter ? " on" : "");
+    const tc = t === "all" ? { bg:"var(--color-background-secondary)", color:"var(--color-text-primary)" } : (tagColors[t] || tagColors.concept);
+    if (t === activeFilter) { btn.style.background = tc.bg; btn.style.color = tc.color; btn.style.borderColor = tc.color; }
+    btn.textContent = labels[t];
+    btn.onclick = () => { activeFilter = t; renderFilters(); renderAll(); };
+    row.appendChild(btn);
+  });
+}
+
+renderFilters();
+renderAll();
+</script>
